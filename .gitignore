@@ -1,0 +1,10 @@
+# Temporary files
+**~
+# Idea project files
+**.iml
+.idea/**
+# Other temporary files
+.**
+# `out` and `target` directories with contents
+out/**
+target/**
