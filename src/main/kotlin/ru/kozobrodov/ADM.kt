@@ -1,3 +1,5 @@
+package ru.kozobrodov
+
 import com.opencsv.CSVReader
 import org.apache.commons.cli.*
 import java.io.FileInputStream
