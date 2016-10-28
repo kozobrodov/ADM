@@ -1,3 +1,5 @@
+package ru.kozobrodov
+
 import java.util.*
 import javax.mail.*
 import javax.mail.internet.InternetAddress

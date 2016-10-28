@@ -105,7 +105,7 @@
 
         </plugins>
 
-        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
     </build>
 
 

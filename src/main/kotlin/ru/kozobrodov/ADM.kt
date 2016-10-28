@@ -1,3 +1,5 @@
+package ru.kozobrodov
+
 import com.opencsv.CSVReader
 import org.apache.commons.cli.*
 import java.io.FileInputStream
@@ -12,8 +14,7 @@ fun main(args: Array<String>) {
 
     // Send mails
     val mailer = Mailer(properties)
-    for (index in members.indices) {
-        val from = members[index]
+    members.forEachIndexed { index, from ->
         val to = members[(if (index == 0) members.size else index) - 1]
         mailer.sendMail(from.email, properties.getProperty("adm.message.subject"), """
 Hi, ${from.name}!
@@ -44,43 +45,36 @@ fun parseMembersCsv(files: List<String>): MutableList<Member> {
 }
 
 fun parseArgs(args: Array<String>): Pair<Properties, List<String>> {
-    val parser = DefaultParser()
-    val line: CommandLine
-    try {
-        line = parser.parse(getCLIOptions(), args)
+    val line: CommandLine = try {
+        DefaultParser().parse(getCLIOptions(), args)
     } catch (e: ParseException) {
         printHelpAndExit()
         exitProcess(1)
     }
 
-    val list = listOf<String>()
-
     if (line.argList.isEmpty()) {
         printHelpAndExit()
         exitProcess(1)
     }
+
     val properties = loadDefaultProperties()
     if (line.hasOption('c')) {
-        properties + loadPropertiesFromFile(line.getOptionValue('c'))
+        properties.putAll(loadPropertiesFromFile(line.getOptionValue('c')))
     }
 
-    return properties to list
+    return properties to line.argList
 }
 
-fun loadDefaultProperties(): Properties {
-    val properties = Properties()
+fun loadDefaultProperties() = build(Properties()) {
     ClassLoader.getSystemClassLoader().getResourceAsStream("defaults.properties").use {
-        properties.load(it)
+        this.load(it)
     }
-    return properties
 }
 
-fun loadPropertiesFromFile(path: String): Properties {
-    val properties = Properties()
+fun loadPropertiesFromFile(path: String) = build(Properties()) {
     FileInputStream(path).use {
-        properties.load(it)
+        this.load(it)
     }
-    return properties
 }
 
 fun printHelpAndExit() {
@@ -88,10 +82,9 @@ fun printHelpAndExit() {
     formatter.printHelp("adm [options] <csv_members_list>", getCLIOptions())
 }
 
-fun getCLIOptions(): Options {
-    val opts = Options()
-    opts.addOption("c", "config", true, "Prop")
-    opts.addOption(
+fun getCLIOptions(): Options = build(Options()) {
+    addOption("c", "config", true, "Prop")
+    addOption(
         Option.builder("c")
             .hasArg()
             .argName("file")
@@ -99,14 +92,8 @@ fun getCLIOptions(): Options {
             .desc("Property file with configuration which overrides standard config")
             .build()
     )
-    return opts
 }
 
-operator fun Properties.plus(other: Properties) {
-    for (propName in other.propertyNames()) {
-        if (propName is String)
-            setProperty(propName, other.getProperty(propName))
-    }
-}
+fun <T> build(element:T, build: T.()->Unit) = element.apply { build() }
 
 data class Member(val name: String, val email: String)
