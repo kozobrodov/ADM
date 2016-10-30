@@ -28,7 +28,7 @@ Have a good day!
     }
 }
 
-fun parseMembersCsv(files: List<String>): MutableList<Member> {
+private fun parseMembersCsv(files: List<String>): MutableList<Member> {
     val result = ArrayList<Member>()
     for (file in files) {
         val reader = CSVReader(FileReader(file))
@@ -44,7 +44,7 @@ fun parseMembersCsv(files: List<String>): MutableList<Member> {
     return result
 }
 
-fun parseArgs(args: Array<String>): Pair<Properties, List<String>> {
+private fun parseArgs(args: Array<String>): Pair<Properties, List<String>> {
     val line: CommandLine = try {
         DefaultParser().parse(getCLIOptions(), args)
     } catch (e: ParseException) {
@@ -65,24 +65,24 @@ fun parseArgs(args: Array<String>): Pair<Properties, List<String>> {
     return properties to line.argList
 }
 
-fun loadDefaultProperties() = build(Properties()) {
+private fun loadDefaultProperties() = build(Properties()) {
     ClassLoader.getSystemClassLoader().getResourceAsStream("defaults.properties").use {
         this.load(it)
     }
 }
 
-fun loadPropertiesFromFile(path: String) = build(Properties()) {
+private fun loadPropertiesFromFile(path: String) = build(Properties()) {
     FileInputStream(path).use {
         this.load(it)
     }
 }
 
-fun printHelpAndExit() {
+private fun printHelpAndExit() {
     val formatter = HelpFormatter()
     formatter.printHelp("adm [options] <csv_members_list>", getCLIOptions())
 }
 
-fun getCLIOptions(): Options = build(Options()) {
+private fun getCLIOptions(): Options = build(Options()) {
     addOption("c", "config", true, "Prop")
     addOption(
         Option.builder("c")
