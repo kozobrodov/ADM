@@ -5,7 +5,18 @@ import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
-class Mailer {
+/**
+ * Class for sending e-mail messages
+ *
+ * It gets mail settings (such as `host`, `port`, and others) from `properties`
+ * parameter of constructor. User credentials for specified mail server can be in
+ * properties too. In other case `Mailer` will ask user name and password from
+ * console (via [java.io.Console.readLine] and [java.io.Console.readPassword] methods)
+ *
+ * @constructor creates new instance of `Mailer` with properties from
+ *  instance of [java.util.Properties]
+ */
+internal class Mailer(properties: Properties) {
     // Keys
     val AUTH = "mail.smtp.auth"
     val FROM = "adm.message.from"
@@ -16,7 +27,7 @@ class Mailer {
     private val session: Session
     private val from: InternetAddress
 
-    constructor(properties: Properties) {
+    init {
         if (properties.containsKey(AUTH)) {
             val (username, password) = getCredentials(properties)
             session = Session.getDefaultInstance(properties, object : Authenticator() {
@@ -30,6 +41,13 @@ class Mailer {
         from = InternetAddress(properties.getProperty(FROM))
     }
 
+    /**
+     * Sends e-mail with specified subject and message to specified e-mail address
+     *
+     * @param to string with e-mail address of message receiver
+     * @param subject e-mail subject
+     * @param message e-mail message
+     */
     @Suppress("UsePropertyAccessSyntax")
     fun sendMail(to: String, subject: String, message: String) {
         val mimeMessage = MimeMessage(session)
